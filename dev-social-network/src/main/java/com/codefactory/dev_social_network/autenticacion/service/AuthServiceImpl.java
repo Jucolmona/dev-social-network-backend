@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private static final int MAX_INTENTOS = 5;
-    private static final long BLOQUEO_MINUTOS = 30;
+    private static final int MAX_INTENTOS = 3;
+    private static final long BLOQUEO_MINUTOS = 5;
 
     private final CredencialRepository credencialRepository;
     private final PasswordEncoder passwordEncoder;
