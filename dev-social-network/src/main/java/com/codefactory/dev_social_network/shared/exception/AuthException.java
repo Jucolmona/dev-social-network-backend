@@ -1,4 +1,4 @@
-package com.codefactory.dev_social_network.autenticacion.service.exception;
+package com.codefactory.dev_social_network.shared.exception;
 
 public class AuthException extends RuntimeException {
     private final AuthErrorCode errorCode;
