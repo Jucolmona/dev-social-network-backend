@@ -1,0 +1,23 @@
+package com.codefactory.dev_social_network.autenticacion.messaging;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
+
+
+@Component
+public class AuthEventPublisher {
+
+    private final ApplicationEventPublisher publisher;
+
+    public AuthEventPublisher(ApplicationEventPublisher publisher) {
+        this.publisher = publisher;
+    }
+
+    public void publicarSesionIniciada(Long usuarioId, String correoElectronico, String ip, String userAgent) {
+        publisher.publishEvent(new SesionIniciadaEvent(usuarioId, correoElectronico, ip, userAgent));
+    }
+
+    public void publicarCuentaBloqueada(Long usuarioId, String correoElectronico, int intentosFallidos, java.time.LocalDateTime bloqueadoHasta) {
+        publisher.publishEvent(new CuentaBloqueadaEvent(usuarioId, correoElectronico, intentosFallidos, bloqueadoHasta));
+    }
+}
