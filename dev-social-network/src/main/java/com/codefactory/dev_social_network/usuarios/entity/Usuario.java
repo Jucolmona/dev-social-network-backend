@@ -12,24 +12,18 @@ import jakarta.persistence.Table;
 @Table(name = "usuarios")
 public class Usuario {
 
-
-
-    @Id 
-    @GeneratedValue 
+    @Id
+    @GeneratedValue
     private UUID id;
 
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column (name="contrasena_hash", nullable = false)
-    private String contrasenaHash;
-
     protected Usuario() {
     }
 
-    public Usuario(String email, String contrasenaHash) {
+    public Usuario(String email) {
         this.email = email;
-        this.contrasenaHash = contrasenaHash;
     }
 
     public UUID getId() {
@@ -39,12 +33,4 @@ public class Usuario {
     public String getEmail() {
         return email;
     }
-
-    public String getContrasenaHash() {
-        return contrasenaHash;
-    }
-
-    
-    
-    
 }
