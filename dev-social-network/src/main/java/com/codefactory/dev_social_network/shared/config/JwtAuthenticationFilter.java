@@ -32,9 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = header.substring(7);
 
             if (jwtProvider.esTokenValido(token)) {
-                Long credencialId = jwtProvider.obtenerCredencialId(token);
-                var authentication = new UsernamePasswordAuthenticationToken(
-                        credencialId, null, List.of());
+                UUID usuarioId = jwtProvider.obtenerUsuarioId(token);
+                var authentication = new UsernamePasswordAuthenticationToken(usuarioId, null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtProvider {
@@ -18,13 +19,13 @@ public class JwtProvider {
     @Value("${app.jwt.access-ttl-minutos:15}")
     private int accessTtlMinutos;
 
-    public String generarAccessToken(Long credencialId) {
+    public String generarAccessToken(UUID usuarioId) {
         SecretKey key = getKey();
         Date ahora = new Date();
         Date expira = new Date(ahora.getTime() + accessTtlMinutos * 60_000L);
 
         return Jwts.builder()
-                .subject(String.valueOf(credencialId))
+                .subject(usuarioId.toString())
                 .issuedAt(ahora)
                 .expiration(expira)
                 .signWith(key)
@@ -40,10 +41,10 @@ public class JwtProvider {
         }
     }
 
-    public Long obtenerCredencialId(String token) {
+    public UUID obtenerUsuarioId(String token) {
         String subject = Jwts.parser().verifyWith(getKey()).build()
                 .parseSignedClaims(token).getPayload().getSubject();
-        return Long.valueOf(subject);
+        return UUID.fromString(subject);
     }
 
     private SecretKey getKey() {
