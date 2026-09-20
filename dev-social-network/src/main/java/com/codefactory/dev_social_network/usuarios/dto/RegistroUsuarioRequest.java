@@ -1,0 +1,4 @@
+package com.codefactory.dev_social_network.usuarios.dto;
+
+public record RegistroUsuarioRequest(String email, String contraseña) {
+}
