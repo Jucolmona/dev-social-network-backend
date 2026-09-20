@@ -26,7 +26,7 @@ public class Credencial {
     @Column(nullable = false)
     private String tipo;
 
-    @Column(name = "password_hash")
+    @Column(name = "password_hash", nullable = false, length = 100)
     private String passwordHash;
 
     @Column(name = "intentos_fallidos", nullable = false)
