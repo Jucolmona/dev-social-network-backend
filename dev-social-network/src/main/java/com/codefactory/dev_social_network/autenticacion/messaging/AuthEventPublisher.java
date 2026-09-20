@@ -13,11 +13,11 @@ public class AuthEventPublisher {
         this.publisher = publisher;
     }
 
-    public void publicarSesionIniciada(Long usuarioId, String correoElectronico, String ip, String userAgent) {
-        publisher.publishEvent(new SesionIniciadaEvent(usuarioId, correoElectronico, ip, userAgent));
+    public void publicarSesionIniciada(Long usuarioId, String email, String ip, String userAgent) {
+        publisher.publishEvent(new SesionIniciadaEvent(usuarioId, email, ip, userAgent));
     }
 
-    public void publicarCuentaBloqueada(Long usuarioId, String correoElectronico, int intentosFallidos, java.time.LocalDateTime bloqueadoHasta) {
-        publisher.publishEvent(new CuentaBloqueadaEvent(usuarioId, correoElectronico, intentosFallidos, bloqueadoHasta));
+    public void publicarCuentaBloqueada(Long usuarioId, String email, int intentosFallidos, java.time.LocalDateTime bloqueadoHasta) {
+        publisher.publishEvent(new CuentaBloqueadaEvent(usuarioId, email, intentosFallidos, bloqueadoHasta));
     }
 }

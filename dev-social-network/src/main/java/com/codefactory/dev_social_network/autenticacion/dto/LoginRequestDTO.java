@@ -11,23 +11,23 @@ public class LoginRequestDTO {
             regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
             message = "El Email no tiene un formato válido"
     )
-    private String correoElectronico;
+    private String email;
 
     @NotBlank(message = "La contraseña es obligatoria")
     @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
-    private String contrasena;
+    private String password;
 
     public LoginRequestDTO() {
     }
 
-    public LoginRequestDTO(String correoElectronico, String contrasena) {
-        this.correoElectronico = correoElectronico;
-        this.contrasena = contrasena;
+    public LoginRequestDTO(String email, String password) {
+        this.email = email;
+        this.password = password;
     }
 
-    public String getCorreoElectronico() { return correoElectronico; }
-    public void setCorreoElectronico(String correoElectronico) { this.correoElectronico = correoElectronico; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getContrasena() { return contrasena; }
-    public void setContrasena(String contrasena) { this.contrasena = contrasena; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 }
