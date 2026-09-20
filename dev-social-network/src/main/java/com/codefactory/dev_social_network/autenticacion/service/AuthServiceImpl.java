@@ -49,6 +49,6 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtProvider.generarAccessToken(credencial.getId());
 
-        return new LoginResponseDTO(credencial.getCorreoElectronico(), "Inicio de sesión exitoso");
+        return new LoginResponseDTO(credencial.getCorreoElectronico(), "Inicio de sesión exitoso", token);
     }
 }

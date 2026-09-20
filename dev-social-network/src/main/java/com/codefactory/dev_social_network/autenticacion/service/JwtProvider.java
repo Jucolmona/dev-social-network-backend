@@ -1,5 +1,6 @@
 package com.codefactory.dev_social_network.autenticacion.service;
 
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +19,7 @@ public class JwtProvider {
     private int accessTtlMinutos;
 
     public String generarAccessToken(Long credencialId) {
-        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
+        SecretKey key = getKey();
         Date ahora = new Date();
         Date expira = new Date(ahora.getTime() + accessTtlMinutos * 60_000L);
 
@@ -28,6 +29,25 @@ public class JwtProvider {
                 .expiration(expira)
                 .signWith(key)
                 .compact();
+    }
+
+    public boolean esTokenValido(String token) {
+        try {
+            Jwts.parser().verifyWith(getKey()).build().parseSignedClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public Long obtenerCredencialId(String token) {
+        String subject = Jwts.parser().verifyWith(getKey()).build()
+                .parseSignedClaims(token).getPayload().getSubject();
+        return Long.valueOf(subject);
+    }
+
+    private SecretKey getKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public int getAccessTtlMinutos() {
