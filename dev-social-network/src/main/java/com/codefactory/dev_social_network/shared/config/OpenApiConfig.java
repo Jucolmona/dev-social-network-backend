@@ -1,4 +1,4 @@
-package com.codefactory.backend.config;
+package com.codefactory.dev_social_network.shared.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
