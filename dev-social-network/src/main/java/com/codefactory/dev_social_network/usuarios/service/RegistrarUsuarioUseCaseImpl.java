@@ -1,17 +1,17 @@
 package com.codefactory.dev_social_network.usuarios.service;
 
-import com.codefactory.dev_social_network.usuarios.entity.Usuario;
-import com.codefactory.dev_social_network.usuarios.interfaces.RegistrarUsuarioUseCase;
-import com.codefactory.dev_social_network.usuarios.interfaces.UsuarioRepositoryPort;
+import java.util.UUID;
+import java.util.regex.Pattern;
+
+import org.springframework.stereotype.Service;
+
 import com.codefactory.dev_social_network.shared.exception.EmailDuplicadoException;
 import com.codefactory.dev_social_network.shared.exception.FormatoEmailInvalidoException;
 import com.codefactory.dev_social_network.shared.exception.PasswordInseguraException;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.UUID;
-import java.util.regex.Pattern;
+import com.codefactory.dev_social_network.usuarios.entity.Usuario;
+import com.codefactory.dev_social_network.usuarios.interfaces.PasswordHasher;
+import com.codefactory.dev_social_network.usuarios.interfaces.RegistrarUsuarioUseCase;
+import com.codefactory.dev_social_network.usuarios.interfaces.UsuarioRepositoryPort;
 
 @Service
 public class RegistrarUsuarioUseCaseImpl implements RegistrarUsuarioUseCase {
@@ -20,10 +20,12 @@ public class RegistrarUsuarioUseCaseImpl implements RegistrarUsuarioUseCase {
         Pattern.compile("^[\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,}$");
 
     private final UsuarioRepositoryPort usuarioRepositoryPort;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordHasher passwordHasher;
 
-    public RegistrarUsuarioUseCaseImpl(UsuarioRepositoryPort usuarioRepositoryPort) {
+    public RegistrarUsuarioUseCaseImpl(UsuarioRepositoryPort usuarioRepositoryPort,
+                                       PasswordHasher passwordHasher) {
         this.usuarioRepositoryPort = usuarioRepositoryPort;
+        this.passwordHasher = passwordHasher;
     }
 
     @Override
@@ -39,7 +41,7 @@ public class RegistrarUsuarioUseCaseImpl implements RegistrarUsuarioUseCase {
 
         validarSeguridadContraseña(contraseña);
 
-        String contraseñaHash = passwordEncoder.encode(contraseña);
+        String contraseñaHash = passwordHasher.hashear(contraseña);
         Usuario nuevoUsuario = new Usuario(email, contraseñaHash);
         Usuario usuarioGuardado = usuarioRepositoryPort.guardar(nuevoUsuario);
 
