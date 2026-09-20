@@ -1,14 +1,19 @@
 package com.codefactory.dev_social_network.usuarios.controller;
 
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.codefactory.dev_social_network.usuarios.dto.RegistroUsuarioRequest;
 import com.codefactory.dev_social_network.usuarios.dto.RegistroUsuarioResponse;
 import com.codefactory.dev_social_network.usuarios.interfaces.RegistrarUsuarioUseCase;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -21,7 +26,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<RegistroUsuarioResponse> registrar(@RequestBody RegistroUsuarioRequest request) {
+    public ResponseEntity<RegistroUsuarioResponse> registrar(@Valid @RequestBody RegistroUsuarioRequest request) {
         UUID id = registrarUsuarioUseCase.registrar(request.email(), request.contraseña());
         RegistroUsuarioResponse response = new RegistroUsuarioResponse(id, "Cuenta creada exitosamente");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
