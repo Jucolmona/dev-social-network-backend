@@ -36,7 +36,8 @@ public class AuthServiceImpl implements AuthService {
         UsuarioDTO usuario = usuarioQueryService.buscarPorEmail(request.getEmail())
                 .orElseThrow(CredencialesInvalidasException::new);
 
-        UUID usuarioId = usuario.getId();
+        UUID usuarioId = usuario.id();
+        String email = usuario.email();
 
         CredencialEntity credencial = credencialRepository.findByUsuarioId(usuarioId)
                 .orElseThrow(CredencialesInvalidasException::new);
@@ -56,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
 
             if (credencial.estaBloqueada()) {
                 authEventPublisher.publicarCuentaBloqueada(
-                        usuarioId, usuario.getEmail(), credencial.getIntentosFallidos(), credencial.getBloqueadoHasta());
+                        usuarioId, email, credencial.getIntentosFallidos(), credencial.getBloqueadoHasta());
             }
             throw new CredencialesInvalidasException();
         }
@@ -65,8 +66,8 @@ public class AuthServiceImpl implements AuthService {
         credencialRepository.save(credencial);
 
         String token = jwtProvider.generarAccessToken(usuarioId);
-        authEventPublisher.publicarSesionIniciada(usuarioId, usuario.getEmail(), null, null);
+        authEventPublisher.publicarSesionIniciada(usuarioId, email, null, null);
 
-        return new LoginResponseDTO(usuario.getEmail(), "Inicio de sesión exitoso", token);
+        return new LoginResponseDTO(email, "Inicio de sesión exitoso", token);
     }
 }

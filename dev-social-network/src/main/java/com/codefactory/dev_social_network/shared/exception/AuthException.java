@@ -1,15 +1,12 @@
 package com.codefactory.dev_social_network.shared.exception;
 
-public class AuthException extends RuntimeException {
-    private final AuthErrorCode errorCode;
+public class AuthException extends BusinessException {
     private final Object details;
 
     public AuthException(AuthErrorCode errorCode, String message, Object details) {
-        super(message);
-        this.errorCode = errorCode;
+        super(errorCode.name(), message, errorCode.getStatus());
         this.details = details;
     }
 
-    public AuthErrorCode getErrorCode() { return errorCode; }
     public Object getDetails() { return details; }
 }
