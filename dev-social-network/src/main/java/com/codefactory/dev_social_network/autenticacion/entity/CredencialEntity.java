@@ -40,32 +40,6 @@ public class CredencialEntity {
         this.intentosFallidos = 0;
     }
 
-    public static CredencialEntity local(UUID usuarioId, String passwordHash) {
-        return new CredencialEntity(usuarioId, "LOCAL", passwordHash, null);
-    }
-
-    public boolean estaBloqueada() {
-        return bloqueadoHasta != null && bloqueadoHasta.isAfter(LocalDateTime.now());
-    }
-
-    public void registrarIntentoFallido(int maximoIntentos, long minutosBloqueo) {
-        this.intentosFallidos++;
-        if (this.intentosFallidos >= maximoIntentos) {
-            this.bloqueadoHasta = LocalDateTime.now().plusMinutes(minutosBloqueo);
-        }
-    }
-
-    public void reiniciarIntentosFallidos() {
-        this.intentosFallidos = 0;
-        this.bloqueadoHasta = null;
-    }
-
-    public void desbloquearSiVencio() {
-        if (bloqueadoHasta != null && !bloqueadoHasta.isAfter(LocalDateTime.now())) {
-            reiniciarIntentosFallidos();
-        }
-    }
-
     public UUID getId() { return id; }
     public UUID getUsuarioId() { return usuarioId; }
     public String getTipo() { return tipo; }
@@ -73,4 +47,7 @@ public class CredencialEntity {
     public String getProveedorIdExterno() { return proveedorIdExterno; }
     public int getIntentosFallidos() { return intentosFallidos; }
     public LocalDateTime getBloqueadoHasta() { return bloqueadoHasta; }
+
+    public void setIntentosFallidos(int intentosFallidos) { this.intentosFallidos = intentosFallidos; }
+    public void setBloqueadoHasta(LocalDateTime bloqueadoHasta) { this.bloqueadoHasta = bloqueadoHasta; }
 }
