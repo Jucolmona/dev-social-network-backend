@@ -13,12 +13,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CredencialServiceImpl implements CredencialService {
 
+    private static final String TIPO_LOCAL = "LOCAL";
+
     private final CredencialRepository credencialRepository;
 
     @Override
     @Transactional
     public void crearCredencialLocal(UUID usuarioId, String passwordHash) {
-        CredencialEntity credencial = CredencialEntity.local(usuarioId, passwordHash);
+        CredencialEntity credencial = new CredencialEntity(usuarioId, TIPO_LOCAL, passwordHash, null);
         credencialRepository.save(credencial);
     }
 }

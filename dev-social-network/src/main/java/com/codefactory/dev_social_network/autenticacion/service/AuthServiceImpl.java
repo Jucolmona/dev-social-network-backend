@@ -4,6 +4,7 @@ import com.codefactory.dev_social_network.autenticacion.dto.LoginRequestDTO;
 import com.codefactory.dev_social_network.autenticacion.dto.LoginResponseDTO;
 import com.codefactory.dev_social_network.autenticacion.entity.CredencialEntity;
 import com.codefactory.dev_social_network.autenticacion.interfaces.AuthService;
+import com.codefactory.dev_social_network.autenticacion.interfaces.CredencialBloqueoPolicy;
 import com.codefactory.dev_social_network.autenticacion.messaging.AuthEventPublisher;
 import com.codefactory.dev_social_network.autenticacion.repository.CredencialRepository;
 import com.codefactory.dev_social_network.shared.exception.CredencialesInvalidasException;
@@ -21,11 +22,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private static final int MAX_INTENTOS = 3;
-    private static final long BLOQUEO_MINUTOS = 5;
-
     private final UsuarioQueryService usuarioQueryService;
     private final CredencialRepository credencialRepository;
+    private final CredencialBloqueoPolicy credencialBloqueoPolicy;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final AuthEventPublisher authEventPublisher;
@@ -45,9 +44,9 @@ public class AuthServiceImpl implements AuthService {
         CredencialEntity credencial = credencialRepository.findByUsuarioId(usuarioId)
                 .orElseThrow(CredencialesInvalidasException::new);
 
-        credencial.desbloquearSiVencio();
+        credencialBloqueoPolicy.desbloquearSiVencio(credencial);
 
-        if (credencial.estaBloqueada()) {
+        if (credencialBloqueoPolicy.estaBloqueada(credencial)) {
             throw new CuentaBloqueadaException(credencial.getBloqueadoHasta());
         }
 
@@ -55,17 +54,17 @@ public class AuthServiceImpl implements AuthService {
                 && passwordEncoder.matches(request.getPassword(), credencial.getPasswordHash());
 
         if (!credencialesValidas) {
-            credencial.registrarIntentoFallido(MAX_INTENTOS, BLOQUEO_MINUTOS);
+            credencialBloqueoPolicy.registrarIntentoFallido(credencial);
             credencialRepository.save(credencial);
 
-            if (credencial.estaBloqueada()) {
+            if (credencialBloqueoPolicy.estaBloqueada(credencial)) {
                 authEventPublisher.publicarCuentaBloqueada(
                         usuarioId, email, credencial.getIntentosFallidos(), credencial.getBloqueadoHasta());
             }
             throw new CredencialesInvalidasException();
         }
 
-        credencial.reiniciarIntentosFallidos();
+        credencialBloqueoPolicy.reiniciarIntentosFallidos(credencial);
         credencialRepository.save(credencial);
 
         String token = jwtProvider.generarAccessToken(usuarioId);
