@@ -6,12 +6,11 @@ import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.codefactory.dev_social_network.autenticacion.interfaces.CredencialService;
 import com.codefactory.dev_social_network.shared.exception.EmailDuplicadoException;
 import com.codefactory.dev_social_network.shared.exception.FormatoEmailInvalidoException;
 import com.codefactory.dev_social_network.shared.exception.PasswordInseguraException;
-import com.codefactory.dev_social_network.usuarios.entity.Credencial;
 import com.codefactory.dev_social_network.usuarios.entity.Usuario;
-import com.codefactory.dev_social_network.usuarios.interfaces.CredencialRepositoryPort;
 import com.codefactory.dev_social_network.usuarios.interfaces.PasswordHasher;
 import com.codefactory.dev_social_network.usuarios.interfaces.RegistrarUsuarioUseCase;
 import com.codefactory.dev_social_network.usuarios.interfaces.UsuarioRepositoryPort;
@@ -23,14 +22,14 @@ public class RegistrarUsuarioUseCaseImpl implements RegistrarUsuarioUseCase {
         Pattern.compile("^[\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,}$");
 
     private final UsuarioRepositoryPort usuarioRepositoryPort;
-    private final CredencialRepositoryPort credencialRepositoryPort;
+    private final CredencialService credencialService;
     private final PasswordHasher passwordHasher;
 
     public RegistrarUsuarioUseCaseImpl(UsuarioRepositoryPort usuarioRepositoryPort,
-                                       CredencialRepositoryPort credencialRepositoryPort,
+                                       CredencialService credencialService,
                                        PasswordHasher passwordHasher) {
         this.usuarioRepositoryPort = usuarioRepositoryPort;
-        this.credencialRepositoryPort = credencialRepositoryPort;
+        this.credencialService = credencialService;
         this.passwordHasher = passwordHasher;
     }
 
@@ -49,8 +48,8 @@ public class RegistrarUsuarioUseCaseImpl implements RegistrarUsuarioUseCase {
         validarSeguridadContraseña(contraseña);
 
         Usuario usuarioGuardado = usuarioRepositoryPort.guardar(new Usuario(email));
-        credencialRepositoryPort.guardar(
-                new Credencial(usuarioGuardado, passwordHasher.hashear(contraseña)));
+        credencialService.crearCredencialLocal(
+                usuarioGuardado.getId(), passwordHasher.hashear(contraseña));
 
         return usuarioGuardado.getId();
     }
