@@ -31,7 +31,10 @@ public class AuthServiceImpl implements AuthService {
     private final AuthEventPublisher authEventPublisher;
 
     @Override
-    @Transactional
+    @Transactional(noRollbackFor = {
+            CredencialesInvalidasException.class,
+            CuentaBloqueadaException.class
+    })
     public LoginResponseDTO iniciarSesion(LoginRequestDTO request) {
         UsuarioDTO usuario = usuarioQueryService.buscarPorEmail(request.getEmail())
                 .orElseThrow(CredencialesInvalidasException::new);
