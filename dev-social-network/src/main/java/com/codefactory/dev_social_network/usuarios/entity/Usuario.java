@@ -1,5 +1,6 @@
 package com.codefactory.dev_social_network.usuarios.entity;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -19,11 +20,21 @@ public class Usuario {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column
+    private String nombre;
+
+    @Column
+    private String apellido;
+
+    @Column(name = "fecha_registro", nullable = false)
+    private LocalDate fechaRegistro;
+
     protected Usuario() {
     }
 
     public Usuario(String email) {
         this.email = email;
+        this.fechaRegistro = LocalDate.now();
     }
 
     public UUID getId() {
@@ -32,5 +43,17 @@ public class Usuario {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public LocalDate getFechaRegistro() {
+        return fechaRegistro;
     }
 }

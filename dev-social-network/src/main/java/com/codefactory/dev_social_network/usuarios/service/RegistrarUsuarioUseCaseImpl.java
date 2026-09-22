@@ -3,15 +3,15 @@ package com.codefactory.dev_social_network.usuarios.service;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.codefactory.dev_social_network.autenticacion.interfaces.CredencialService;
+import com.codefactory.dev_social_network.autenticacion.entity.CredencialEntity;
+import com.codefactory.dev_social_network.autenticacion.repository.CredencialRepository;
 import com.codefactory.dev_social_network.shared.exception.EmailDuplicadoException;
 import com.codefactory.dev_social_network.shared.exception.FormatoEmailInvalidoException;
 import com.codefactory.dev_social_network.shared.exception.PasswordInseguraException;
 import com.codefactory.dev_social_network.usuarios.entity.Usuario;
-import com.codefactory.dev_social_network.usuarios.interfaces.PasswordHasher;
 import com.codefactory.dev_social_network.usuarios.interfaces.RegistrarUsuarioUseCase;
 import com.codefactory.dev_social_network.usuarios.interfaces.UsuarioRepositoryPort;
 
@@ -22,19 +22,18 @@ public class RegistrarUsuarioUseCaseImpl implements RegistrarUsuarioUseCase {
         Pattern.compile("^[\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,}$");
 
     private final UsuarioRepositoryPort usuarioRepositoryPort;
-    private final CredencialService credencialService;
-    private final PasswordHasher passwordHasher;
+    private final CredencialRepository credencialRepository;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public RegistrarUsuarioUseCaseImpl(UsuarioRepositoryPort usuarioRepositoryPort,
-                                       CredencialService credencialService,
-                                       PasswordHasher passwordHasher) {
+    public RegistrarUsuarioUseCaseImpl(
+            UsuarioRepositoryPort usuarioRepositoryPort,
+            CredencialRepository credencialRepository
+    ) {
         this.usuarioRepositoryPort = usuarioRepositoryPort;
-        this.credencialService = credencialService;
-        this.passwordHasher = passwordHasher;
+        this.credencialRepository = credencialRepository;
     }
 
     @Override
-    @Transactional
     public UUID registrar(String email, String contraseña) {
 
         if (!EMAIL_REGEX.matcher(email).matches()) {
@@ -47,9 +46,17 @@ public class RegistrarUsuarioUseCaseImpl implements RegistrarUsuarioUseCase {
 
         validarSeguridadContraseña(contraseña);
 
-        Usuario usuarioGuardado = usuarioRepositoryPort.guardar(new Usuario(email));
-        credencialService.crearCredencialLocal(
-                usuarioGuardado.getId(), passwordHasher.hashear(contraseña));
+        Usuario nuevoUsuario = new Usuario(email);
+        Usuario usuarioGuardado = usuarioRepositoryPort.guardar(nuevoUsuario);
+
+        String hash = passwordEncoder.encode(contraseña);
+        CredencialEntity credencial = new CredencialEntity(
+                usuarioGuardado.getId(),
+                "LOCAL",
+                hash,
+                null
+        );
+        credencialRepository.save(credencial);
 
         return usuarioGuardado.getId();
     }
