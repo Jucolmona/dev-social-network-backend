@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface UserProfileRepository extends Repository<UserProfileEntity, UUID> {
     Optional<UserProfileEntity> findById(UUID id);
-    Optional<UserProfileEntity> findByUserId(UUID userId);
+    Optional<UserProfileEntity> findByUserId_Id(UUID userId);
     List<UserProfileEntity> findBySeniorityLevel(ExperienceLevel seniorityLevel);
     UserProfileEntity save(UserProfileEntity userProfileEntity);
 }

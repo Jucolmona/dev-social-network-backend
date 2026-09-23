@@ -45,10 +45,15 @@ public class UserProfileEntity {
     @Enumerated(EnumType.STRING)
     private ExperienceLevel seniorityLevel;
 
+    @Column (name = "years_of_experience", nullable = true)
+    private Integer yearsOfExperience;
+
     protected UserProfileEntity() {}
 
-    protected UserProfileEntity(Usuario userId){
+    public UserProfileEntity(Usuario userId){
         this.userId = userId;
+        this.createdAt = LocalDate.now();
+        this.completedProfile = 0;
     }
 
     public UUID getId() {
@@ -91,11 +96,23 @@ public class UserProfileEntity {
         return devInitialDate;
     }
 
+    public void setDevInitialDate(LocalDate devInitialDate) {
+        this.devInitialDate = devInitialDate;
+    }
+
     public ExperienceLevel getSeniorityLevel() {
         return seniorityLevel;
     }
 
     public void setSeniorityLevel(ExperienceLevel seniorityLevel) {
         this.seniorityLevel = seniorityLevel;
+    }
+
+    public Integer getYearsOfExperience() {
+        return yearsOfExperience;
+    }
+
+    public void setYearsOfExperience(Integer yearsOfExperience) {
+        this.yearsOfExperience = yearsOfExperience;
     }
 }

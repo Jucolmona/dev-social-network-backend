@@ -2,15 +2,14 @@ package com.codefactory.dev_social_network.usuarios.entity;
 
 import java.util.UUID;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Column;
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity 
 @Table(name = "user_habilities")
@@ -20,16 +19,19 @@ public class UserHabilitiesEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "name_hanility", unique = true, nullable = false)
+    @Column(name = "name_hability", nullable = false)
     private String nameHability;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn (name = "userProfile_id", referencedColumnName = "id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "user_profile_id", referencedColumnName = "id", nullable = false)
     private UserProfileEntity userProfile;
 
-    // aditio tecnoligies
-
     protected UserHabilitiesEntity() {}
+
+    public UserHabilitiesEntity(String nameHability, UserProfileEntity userProfile) {
+        this.nameHability = nameHability;
+        this.userProfile = userProfile;
+    }
 
     public UUID getId() {
         return id;
@@ -51,8 +53,4 @@ public class UserHabilitiesEntity {
         this.userProfile = userProfile;
     }
 
-    
-
-
-    
 }

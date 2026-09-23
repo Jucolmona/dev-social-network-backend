@@ -32,6 +32,12 @@ public class UserExternalLinksEntity {
 
     protected UserExternalLinksEntity() {}
 
+    public UserExternalLinksEntity(String linkName, String linkUrl, UserProfileEntity userProfile) {
+        this.linkName = linkName;
+        this.linkUrl = linkUrl;
+        this.userProfile = userProfile;
+    }
+
     public UUID getId() {
         return id;
     }
