@@ -22,7 +22,7 @@ import com.codefactory.dev_social_network.usuarios.interfaces.UserProfileService
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/usuarios")
+@RequestMapping("/api/v1/usuarios")
 public class UsuarioController {
 
     private final RegistrarUsuarioUseCase registrarUsuarioUseCase;
