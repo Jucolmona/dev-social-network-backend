@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public interface RegistrarUsuarioUseCase {
 
-    UUID registrar(String email, String contraseña);
+    UUID registrar(String email, String nombre, String apellido, String contraseña);
 
 }
