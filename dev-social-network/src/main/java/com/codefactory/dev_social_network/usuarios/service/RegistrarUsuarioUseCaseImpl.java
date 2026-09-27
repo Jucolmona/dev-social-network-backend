@@ -10,7 +10,6 @@ import com.codefactory.dev_social_network.autenticacion.interfaces.CredencialSer
 import com.codefactory.dev_social_network.shared.exception.EmailDuplicadoException;
 import com.codefactory.dev_social_network.shared.exception.FormatoEmailInvalidoException;
 import com.codefactory.dev_social_network.shared.exception.PasswordInseguraException;
-import com.codefactory.dev_social_network.usuarios.entity.Credencial;
 import com.codefactory.dev_social_network.usuarios.entity.UserProfileEntity;
 import com.codefactory.dev_social_network.usuarios.entity.Usuario;
 import com.codefactory.dev_social_network.usuarios.interfaces.PasswordHasher;
@@ -25,25 +24,17 @@ public class RegistrarUsuarioUseCaseImpl implements RegistrarUsuarioUseCase {
         Pattern.compile("^[\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,}$");
 
     private final UsuarioRepositoryPort usuarioRepositoryPort;
-    private final CredencialRepositoryPort credencialRepositoryPort;
+    private final CredencialService credencialService;
     private final UserProfileRepositoryPort userProfileRepositoryPort;
     private final PasswordHasher passwordHasher;
 
     public RegistrarUsuarioUseCaseImpl(UsuarioRepositoryPort usuarioRepositoryPort,
-                                       CredencialRepositoryPort credencialRepositoryPort,
+                                       CredencialService credencialService,
                                        UserProfileRepositoryPort userProfileRepositoryPort,
                                        PasswordHasher passwordHasher) {
         this.usuarioRepositoryPort = usuarioRepositoryPort;
-        this.credencialRepositoryPort = credencialRepositoryPort;
-        this.userProfileRepositoryPort = userProfileRepositoryPort;
-    private final CredencialService credencialService;
-    private final PasswordHasher passwordHasher;
-
-    public RegistrarUsuarioUseCaseImpl(UsuarioRepositoryPort usuarioRepositoryPort,
-                                       CredencialService credencialService,
-                                       PasswordHasher passwordHasher) {
-        this.usuarioRepositoryPort = usuarioRepositoryPort;
         this.credencialService = credencialService;
+        this.userProfileRepositoryPort = userProfileRepositoryPort;
         this.passwordHasher = passwordHasher;
     }
 
@@ -63,9 +54,6 @@ public class RegistrarUsuarioUseCaseImpl implements RegistrarUsuarioUseCase {
 
         Usuario usuarioGuardado = usuarioRepositoryPort.guardar(
                 new Usuario(nombre, apellido, email));
-        credencialRepositoryPort.guardar(
-                new Credencial(usuarioGuardado, passwordHasher.hashear(contraseña)));
-        Usuario usuarioGuardado = usuarioRepositoryPort.guardar(new Usuario(email));
         credencialService.crearCredencialLocal(
                 usuarioGuardado.getId(), passwordHasher.hashear(contraseña));
 
