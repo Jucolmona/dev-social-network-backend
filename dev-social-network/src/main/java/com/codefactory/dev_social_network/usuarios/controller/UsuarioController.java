@@ -27,7 +27,13 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<RegistroUsuarioResponse> registrar(@Valid @RequestBody RegistroUsuarioRequest request) {
-        UUID id = registrarUsuarioUseCase.registrar(request.email(), request.contraseña());
+        UUID id = registrarUsuarioUseCase.registrar(
+            request.email(),
+            request.nombre(),
+            request.apellido(),
+            request.contrasena() 
+        );
+            
         RegistroUsuarioResponse response = new RegistroUsuarioResponse(id, "Cuenta creada exitosamente");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
