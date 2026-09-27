@@ -27,6 +27,7 @@ class PasswordPolicyValidatorTest {
     })
     @DisplayName("acepta contrasenas que cumplen la politica")
     void aceptaContrasenasValidas(String password) {
+        // Act y Assert
         assertThatCode(() -> validator.validar(password)).doesNotThrowAnyException();
     }
 
@@ -43,6 +44,7 @@ class PasswordPolicyValidatorTest {
     })
     @DisplayName("rechaza contrasenas que no cumplen la politica")
     void rechazaContrasenasInvalidas(String password) {
+        // Act y Assert
         assertThatThrownBy(() -> validator.validar(password))
                 .isInstanceOf(AuthException.class)
                 .hasMessageContaining("no cumple la política")
@@ -53,12 +55,16 @@ class PasswordPolicyValidatorTest {
     @Test
     @DisplayName("el error expone el codigo y el HTTP status correctos")
     void errorExponeCodigoYStatus() {
+        // Act y Assert
         assertThatThrownBy(() -> validator.validar("corta"))
                 .isInstanceOfSatisfying(AuthException.class, e -> {
                     assertThat(e.getErrorCode()).isEqualTo(AuthErrorCode.PASSWORD_NO_CUMPLE_POLITICA.name());
+
+        // Assert
                     assertThat(e.getStatus()).isEqualTo(AuthErrorCode.PASSWORD_NO_CUMPLE_POLITICA.getStatus());
                     assertThat((List<?>) e.getDetails())
                             .anySatisfy(detalle -> assertThat(detalle.toString()).contains("mayúscula"));
                 });
     }
 }
+

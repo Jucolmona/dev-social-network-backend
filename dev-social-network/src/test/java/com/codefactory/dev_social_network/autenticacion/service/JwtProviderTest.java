@@ -25,44 +25,68 @@ class JwtProviderTest {
     @Test
     @DisplayName("genera un token cuyo subject es el id del usuario")
     void generaTokenConSubjectUsuario() {
+        // Arrange
         UUID usuarioId = UUID.randomUUID();
 
+        // Act
         String token = provider.generarAccessToken(usuarioId);
 
+        // Assert
         assertThat(token).isNotBlank();
-        assertThat(provider.obtenerUsuarioId(token)).isEqualTo(usuarioId);
+
+        // Act
+        var resultado = provider.obtenerUsuarioId(token);
+
+        // Assert
+        assertThat(resultado).isEqualTo(usuarioId);
     }
 
     @Test
     @DisplayName("el token recien generado es valido")
     void tokenGeneradoEsValido() {
+        // Act
         String token = provider.generarAccessToken(UUID.randomUUID());
+        var resultado = provider.esTokenValido(token);
 
-        assertThat(provider.esTokenValido(token)).isTrue();
+        // Assert
+        assertThat(resultado).isTrue();
     }
 
     @Test
     @DisplayName("un token con otra firma no es valido")
     void tokenConOtraFirmaNoEsValido() {
+        // Arrange
         JwtProvider otro = new JwtProvider();
         ReflectionTestUtils.setField(otro, "secret",
                 "clave_totalmente_distinta_que_al_menos_tiene_32_caracteres");
         ReflectionTestUtils.setField(otro, "accessTtlMinutos", 15);
-
         String tokenAjeno = otro.generarAccessToken(UUID.randomUUID());
 
-        assertThat(provider.esTokenValido(tokenAjeno)).isFalse();
+        // Act
+        var resultado = provider.esTokenValido(tokenAjeno);
+
+        // Assert
+        assertThat(resultado).isFalse();
     }
 
     @Test
     @DisplayName("una cadena sin formato JWT no es valida")
     void cadenaSinFormatoNoEsValida() {
-        assertThat(provider.esTokenValido("esto-no-es-un-jwt")).isFalse();
+        // Act
+        var resultado = provider.esTokenValido("esto-no-es-un-jwt");
+
+        // Assert
+        assertThat(resultado).isFalse();
     }
 
     @Test
     @DisplayName("el TTL de acceso es el configurado")
     void ttlEsElConfigurado() {
-        assertThat(provider.getAccessTtlMinutos()).isEqualTo(15);
+        // Act
+        var resultado = provider.getAccessTtlMinutos();
+
+        // Assert
+        assertThat(resultado).isEqualTo(15);
     }
 }
+

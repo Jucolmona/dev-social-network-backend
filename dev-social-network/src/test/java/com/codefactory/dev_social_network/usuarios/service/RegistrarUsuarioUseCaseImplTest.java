@@ -62,12 +62,15 @@ class RegistrarUsuarioUseCaseImplTest {
     @Test
     @DisplayName("registra el usuario, su credencial y su perfil, y devuelve el id")
     void registraUsuarioCredencialYPerfil() {
+        // Arrange
         when(usuarioRepositoryPort.existePorEmail(EMAIL)).thenReturn(false);
         when(usuarioRepositoryPort.guardar(any(Usuario.class))).thenReturn(usuarioGuardado());
         when(passwordHasher.hashear(PASSWORD)).thenReturn("hash-bcrypt");
 
+        // Act
         UUID resultado = service.registrar(EMAIL, "Ana", "Ruiz", PASSWORD);
 
+        // Assert
         assertThat(resultado).isEqualTo(usuarioId);
         verify(passwordHasher).hashear(PASSWORD);
         verify(credencialService).crearCredencialLocal(usuarioId, "hash-bcrypt");
@@ -77,12 +80,15 @@ class RegistrarUsuarioUseCaseImplTest {
     @Test
     @DisplayName("guarda el usuario con nombre, apellido y email")
     void guardaUsuarioConTodosLosDatos() {
+        // Arrange
         when(usuarioRepositoryPort.existePorEmail(EMAIL)).thenReturn(false);
         when(usuarioRepositoryPort.guardar(any(Usuario.class))).thenReturn(usuarioGuardado());
         when(passwordHasher.hashear(PASSWORD)).thenReturn("hash-bcrypt");
 
+        // Act
         service.registrar(EMAIL, "Ana", "Ruiz", PASSWORD);
 
+        // Assert
         ArgumentCaptor<Usuario> captor = ArgumentCaptor.forClass(Usuario.class);
         verify(usuarioRepositoryPort).guardar(captor.capture());
         assertThat(captor.getValue().getNombre()).isEqualTo("Ana");
@@ -93,40 +99,50 @@ class RegistrarUsuarioUseCaseImplTest {
     @Test
     @DisplayName("rechaza un email con formato invalido")
     void rechazaEmailInvalido() {
+        // Act y Assert
         assertThatThrownBy(() -> service.registrar("no-es-email", "Ana", "Ruiz", PASSWORD))
                 .isInstanceOf(FormatoEmailInvalidoException.class);
 
+        // Assert
         verify(usuarioRepositoryPort, never()).guardar(any());
     }
 
     @Test
     @DisplayName("rechaza un email ya registrado")
     void rechazaEmailDuplicado() {
+        // Arrange
         when(usuarioRepositoryPort.existePorEmail(EMAIL)).thenReturn(true);
 
+        // Act y Assert
         assertThatThrownBy(() -> service.registrar(EMAIL, "Ana", "Ruiz", PASSWORD))
                 .isInstanceOf(EmailDuplicadoException.class);
 
+        // Assert
         verify(usuarioRepositoryPort, never()).guardar(any());
     }
 
     @Test
     @DisplayName("rechaza una contrasena corta")
     void rechazaContrasenaCorta() {
+        // Arrange
         when(usuarioRepositoryPort.existePorEmail(EMAIL)).thenReturn(false);
 
+        // Act y Assert
         assertThatThrownBy(() -> service.registrar(EMAIL, "Ana", "Ruiz", "Aa1!"))
                 .isInstanceOf(PasswordInseguraException.class)
                 .hasMessageContaining("8 caracteres");
 
+        // Assert
         verify(usuarioRepositoryPort, never()).guardar(any());
     }
 
     @Test
     @DisplayName("rechaza una contrasena sin mayuscula")
     void rechazaContrasenaSinMayuscula() {
+        // Arrange
         when(usuarioRepositoryPort.existePorEmail(EMAIL)).thenReturn(false);
 
+        // Act y Assert
         assertThatThrownBy(() -> service.registrar(EMAIL, "Ana", "Ruiz", "secreto1!"))
                 .isInstanceOf(PasswordInseguraException.class)
                 .hasMessageContaining("mayúscula");
@@ -135,8 +151,10 @@ class RegistrarUsuarioUseCaseImplTest {
     @Test
     @DisplayName("rechaza una contrasena sin numero")
     void rechazaContrasenaSinNumero() {
+        // Arrange
         when(usuarioRepositoryPort.existePorEmail(EMAIL)).thenReturn(false);
 
+        // Act y Assert
         assertThatThrownBy(() -> service.registrar(EMAIL, "Ana", "Ruiz", "Secreto!"))
                 .isInstanceOf(PasswordInseguraException.class)
                 .hasMessageContaining("número");
@@ -145,8 +163,10 @@ class RegistrarUsuarioUseCaseImplTest {
     @Test
     @DisplayName("rechaza una contrasena sin caracter especial")
     void rechazaContrasenaSinSimbolo() {
+        // Arrange
         when(usuarioRepositoryPort.existePorEmail(EMAIL)).thenReturn(false);
 
+        // Act y Assert
         assertThatThrownBy(() -> service.registrar(EMAIL, "Ana", "Ruiz", "Secreto123"))
                 .isInstanceOf(PasswordInseguraException.class)
                 .hasMessageContaining("especial");
@@ -155,11 +175,15 @@ class RegistrarUsuarioUseCaseImplTest {
     @Test
     @DisplayName("no hashea la contrasena si la validacion falla")
     void noHasheaSiLaValidacionFalla() {
+        // Arrange
         when(usuarioRepositoryPort.existePorEmail(EMAIL)).thenReturn(false);
 
+        // Act y Assert
         assertThatThrownBy(() -> service.registrar(EMAIL, "Ana", "Ruiz", "corta"))
                 .isInstanceOf(PasswordInseguraException.class);
 
+        // Assert
         verify(passwordHasher, never()).hashear(anyString());
     }
 }
+

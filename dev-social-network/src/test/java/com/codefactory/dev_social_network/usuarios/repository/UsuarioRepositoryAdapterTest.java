@@ -28,63 +28,99 @@ class UsuarioRepositoryAdapterTest {
     @Test
     @DisplayName("existePorEmail delega en el repositorio JPA")
     void existePorEmail() {
+        // Arrange
         when(jpaRepository.existsByEmail("ana@correo.com")).thenReturn(true);
 
-        assertThat(adapter.existePorEmail("ana@correo.com")).isTrue();
+        // Act
+        var resultado = adapter.existePorEmail("ana@correo.com");
+
+        // Assert
+        assertThat(resultado).isTrue();
         verify(jpaRepository).existsByEmail("ana@correo.com");
     }
 
     @Test
     @DisplayName("existePorEmail devuelve false cuando el email no esta registrado")
     void existePorEmailDevuelveFalse() {
+        // Arrange
         when(jpaRepository.existsByEmail("nuevo@correo.com")).thenReturn(false);
 
-        assertThat(adapter.existePorEmail("nuevo@correo.com")).isFalse();
+        // Act
+        var resultado = adapter.existePorEmail("nuevo@correo.com");
+
+        // Assert
+        assertThat(resultado).isFalse();
     }
 
     @Test
     @DisplayName("guardar delega en el repositorio JPA")
     void guardar() {
+        // Arrange
         Usuario usuario = new Usuario("Ana", "Ruiz", "ana@correo.com");
         when(jpaRepository.save(usuario)).thenReturn(usuario);
 
-        assertThat(adapter.guardar(usuario)).isSameAs(usuario);
+        // Act
+        var resultado = adapter.guardar(usuario);
+
+        // Assert
+        assertThat(resultado).isSameAs(usuario);
         verify(jpaRepository).save(usuario);
     }
 
     @Test
     @DisplayName("buscarPorEmail devuelve el usuario encontrado")
     void buscarPorEmail() {
+        // Arrange
         Usuario usuario = new Usuario("Ana", "Ruiz", "ana@correo.com");
         when(jpaRepository.findByEmail("ana@correo.com")).thenReturn(Optional.of(usuario));
 
-        assertThat(adapter.buscarPorEmail("ana@correo.com")).contains(usuario);
+        // Act
+        var resultado = adapter.buscarPorEmail("ana@correo.com");
+
+        // Assert
+        assertThat(resultado).contains(usuario);
     }
 
     @Test
     @DisplayName("buscarPorEmail devuelve vacio si no existe")
     void buscarPorEmailNoEncontrado() {
+        // Arrange
         when(jpaRepository.findByEmail("nadie@correo.com")).thenReturn(Optional.empty());
 
-        assertThat(adapter.buscarPorEmail("nadie@correo.com")).isEmpty();
+        // Act
+        var resultado = adapter.buscarPorEmail("nadie@correo.com");
+
+        // Assert
+        assertThat(resultado).isEmpty();
     }
 
     @Test
     @DisplayName("buscarPorId devuelve el usuario encontrado")
     void buscarPorId() {
+        // Arrange
         UUID id = UUID.randomUUID();
         Usuario usuario = new Usuario("Ana", "Ruiz", "ana@correo.com");
         when(jpaRepository.findById(id)).thenReturn(Optional.of(usuario));
 
-        assertThat(adapter.buscarPorId(id)).contains(usuario);
+        // Act
+        var resultado = adapter.buscarPorId(id);
+
+        // Assert
+        assertThat(resultado).contains(usuario);
     }
 
     @Test
     @DisplayName("buscarPorId devuelve vacio si no existe")
     void buscarPorIdNoEncontrado() {
+        // Arrange
         UUID id = UUID.randomUUID();
         when(jpaRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThat(adapter.buscarPorId(id)).isEmpty();
+        // Act
+        var resultado = adapter.buscarPorId(id);
+
+        // Assert
+        assertThat(resultado).isEmpty();
     }
 }
+

@@ -37,12 +37,15 @@ class UsuarioQueryServiceImplTest {
     @Test
     @DisplayName("mapea la entidad Usuario a un UsuarioDTO con id y email")
     void mapeaEntidadADto() {
+        // Arrange
         UUID id = UUID.randomUUID();
         when(usuarioRepositoryPort.buscarPorEmail("ana@correo.com"))
                 .thenReturn(Optional.of(usuarioConId(id, "ana@correo.com")));
 
+        // Act
         Optional<UsuarioDTO> resultado = service.buscarPorEmail("ana@correo.com");
 
+        // Assert
         assertThat(resultado).isPresent();
         assertThat(resultado.get().id()).isEqualTo(id);
         assertThat(resultado.get().email()).isEqualTo("ana@correo.com");
@@ -51,20 +54,29 @@ class UsuarioQueryServiceImplTest {
     @Test
     @DisplayName("devuelve vacio cuando el email no existe")
     void devuelveVacioSiNoExiste() {
+        // Arrange
         when(usuarioRepositoryPort.buscarPorEmail("nadie@correo.com"))
                 .thenReturn(Optional.empty());
 
-        assertThat(service.buscarPorEmail("nadie@correo.com")).isEmpty();
+        // Act
+        var resultado = service.buscarPorEmail("nadie@correo.com");
+
+        // Assert
+        assertThat(resultado).isEmpty();
     }
 
     @Test
     @DisplayName("delega la busqueda en el puerto de repositorio")
     void delegaEnElPuerto() {
+        // Arrange
         when(usuarioRepositoryPort.buscarPorEmail("ana@correo.com"))
                 .thenReturn(Optional.empty());
 
+        // Act
         service.buscarPorEmail("ana@correo.com");
 
+        // Assert
         verify(usuarioRepositoryPort).buscarPorEmail("ana@correo.com");
     }
 }
+

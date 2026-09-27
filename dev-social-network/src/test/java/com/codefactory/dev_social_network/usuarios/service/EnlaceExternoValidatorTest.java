@@ -21,6 +21,7 @@ class EnlaceExternoValidatorTest {
     @ValueSource(strings = { "   " })
     @DisplayName("un enlace de GitHub vacio es opcional y no se valida")
     void githubVacioEsOpcional(String link) {
+        // Act y Assert
         assertThatCode(() -> validator.validarGithub(link)).doesNotThrowAnyException();
     }
 
@@ -32,6 +33,7 @@ class EnlaceExternoValidatorTest {
     })
     @DisplayName("acepta enlaces de GitHub con el patron esperado")
     void aceptaGithubValido(String link) {
+        // Act y Assert
         assertThatCode(() -> validator.validarGithub(link)).doesNotThrowAnyException();
     }
 
@@ -44,6 +46,7 @@ class EnlaceExternoValidatorTest {
     })
     @DisplayName("rechaza enlaces de GitHub que no cumplen el patron")
     void rechazaGithubInvalido(String link) {
+        // Act y Assert
         assertThatThrownBy(() -> validator.validarGithub(link))
                 .isInstanceOf(EnlaceInvalidoException.class)
                 .hasMessageContaining("GitHub");
@@ -54,12 +57,14 @@ class EnlaceExternoValidatorTest {
     @ValueSource(strings = { "   " })
     @DisplayName("un enlace de LinkedIn vacio es opcional y no se valida")
     void linkedinVacioEsOpcional(String link) {
+        // Act y Assert
         assertThatCode(() -> validator.validarLinkedin(link)).doesNotThrowAnyException();
     }
 
     @Test
     @DisplayName("acepta un enlace de LinkedIn con el patron esperado")
     void aceptaLinkedinValido() {
+        // Act y Assert
         assertThatCode(() -> validator.validarLinkedin("https://www.linkedin.com/in/ana-ruiz/"))
                 .doesNotThrowAnyException();
     }
@@ -73,6 +78,7 @@ class EnlaceExternoValidatorTest {
     })
     @DisplayName("rechaza enlaces de LinkedIn que no cumplen el patron")
     void rechazaLinkedinInvalido(String link) {
+        // Act y Assert
         assertThatThrownBy(() -> validator.validarLinkedin(link))
                 .isInstanceOf(EnlaceInvalidoException.class)
                 .hasMessageContaining("LinkedIn");
@@ -83,6 +89,7 @@ class EnlaceExternoValidatorTest {
     @ValueSource(strings = { "   " })
     @DisplayName("un portafolio vacio es opcional y no se valida")
     void portafolioVacioEsOpcional(String link) {
+        // Act y Assert
         assertThatCode(() -> validator.validarPortafolio(link)).doesNotThrowAnyException();
     }
 
@@ -94,6 +101,7 @@ class EnlaceExternoValidatorTest {
     })
     @DisplayName("acepta cualquier URL de portafolio con esquema y host")
     void aceptaPortafolioValido(String link) {
+        // Act y Assert
         assertThatCode(() -> validator.validarPortafolio(link)).doesNotThrowAnyException();
     }
 
@@ -105,6 +113,7 @@ class EnlaceExternoValidatorTest {
     })
     @DisplayName("rechaza portafolios que no son URLs completas")
     void rechazaPortafolioInvalido(String link) {
+        // Act y Assert
         assertThatThrownBy(() -> validator.validarPortafolio(link))
                 .isInstanceOf(EnlaceInvalidoException.class)
                 .hasMessageContaining("portafolio");
@@ -113,8 +122,10 @@ class EnlaceExternoValidatorTest {
     @Test
     @DisplayName("el mensaje de error de GitHub indica el patron esperado")
     void mensajeIndicaElPatron() {
+        // Act y Assert
         assertThatThrownBy(() -> validator.validarGithub("https://github.com/ana"))
                 .isInstanceOf(EnlaceInvalidoException.class)
                 .hasMessageContaining("http://github.com/");
     }
 }
+

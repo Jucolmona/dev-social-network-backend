@@ -72,10 +72,13 @@ class ProjectServiceTest {
     @Test
     @DisplayName("crea el proyecto y devuelve la respuesta mapeada")
     void creaElProyecto() {
+        // Arrange
         tecnologiasEncontradas();
 
+        // Act
         ProjectResponse respuesta = service.createProject(request("https://github.com/ana/api"));
 
+        // Assert
         assertThat(respuesta.getId()).isEqualTo(10L);
         assertThat(respuesta.getTitle()).isEqualTo("Dev Social Network");
         assertThat(respuesta.getDescription()).isEqualTo("Red social para desarrolladores");
@@ -85,20 +88,26 @@ class ProjectServiceTest {
     @Test
     @DisplayName("mapea las tecnologias a sus nombres")
     void mapeaNombresDeTecnologias() {
+        // Arrange
         tecnologiasEncontradas();
 
+        // Act
         ProjectResponse respuesta = service.createProject(request("https://github.com/ana/api"));
 
+        // Assert
         assertThat(respuesta.getTechnologies()).containsExactly("Java");
     }
 
     @Test
     @DisplayName("persiste el proyecto con las fechas de creacion y actualizacion")
     void persisteConFechas() {
+        // Arrange
         tecnologiasEncontradas();
 
+        // Act
         service.createProject(request("https://github.com/ana/api"));
 
+        // Assert
         ArgumentCaptor<Project> captor = ArgumentCaptor.forClass(Project.class);
         verify(projectRepository).save(captor.capture());
         assertThat(captor.getValue().getCreatedAt()).isNotNull();
@@ -110,14 +119,17 @@ class ProjectServiceTest {
     @Test
     @DisplayName("falla si alguna tecnologia solicitada no existe")
     void fallaSiFaltaAlgunaTecnologia() {
+        // Arrange
         when(technologyRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(tecnologia(1L, "Java")));
         CreateProjectRequest request = request("https://github.com/ana/api");
         request.setTechnologyIds(List.of(1L, 2L));
 
+        // Act y Assert
         assertThatThrownBy(() -> service.createProject(request))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("technologies are invalid");
 
+        // Assert
         verify(projectRepository, never()).save(any());
     }
 
@@ -134,8 +146,10 @@ class ProjectServiceTest {
     })
     @DisplayName("acepta URLs de GitHub, GitLab y Bitbucket")
     void aceptaDominiosPermitidos(String url) {
+        // Arrange
         tecnologiasEncontradas();
 
+        // Act y Assert
         assertThatCode(() -> service.createProject(request(url))).doesNotThrowAnyException();
     }
 
@@ -144,14 +158,17 @@ class ProjectServiceTest {
     @ValueSource(strings = { "   " })
     @DisplayName("una URL de repositorio vacia es opcional")
     void urlVaciaEsOpcional(String url) {
+        // Arrange
         tecnologiasEncontradas();
 
+        // Act y Assert
         assertThatCode(() -> service.createProject(request(url))).doesNotThrowAnyException();
     }
 
     @Test
     @DisplayName("rechaza una URL que no sea https")
     void rechazaUrlSinHttps() {
+        // Act y Assert
         assertThatThrownBy(() -> service.createProject(request("http://github.com/ana/api")))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("valid HTTPS URL");
@@ -160,6 +177,7 @@ class ProjectServiceTest {
     @Test
     @DisplayName("rechaza un dominio que no sea GitHub, GitLab ni Bitbucket")
     void rechazaDominioNoPermitido() {
+        // Act y Assert
         assertThatThrownBy(() -> service.createProject(request("https://mi-empresa.com/api")))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("GitHub, GitLab or Bitbucket");
@@ -168,7 +186,7 @@ class ProjectServiceTest {
     @Test
     @DisplayName("rechaza una URL malformada")
     void rechazaUrlMalformada() {
-        // El espacio hace que URI.create lance y caiga en el catch generico.
+        // Act y Assert
         assertThatThrownBy(() -> service.createProject(request("https://mi empresa.com/api")))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("Invalid repository URL");
@@ -177,6 +195,7 @@ class ProjectServiceTest {
     @Test
     @DisplayName("una URL sin esquema se rechaza como HTTPS invalido")
     void rechazaUrlSinEsquema() {
+        // Act y Assert
         assertThatThrownBy(() -> service.createProject(request("github.com/ana/api")))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("valid HTTPS URL");
@@ -185,9 +204,12 @@ class ProjectServiceTest {
     @Test
     @DisplayName("no busca tecnologias si la URL ya es invalida")
     void validaUrlAntesDeBuscarTecnologias() {
+        // Act y Assert
         assertThatThrownBy(() -> service.createProject(request("https://mi-empresa.com/api")))
                 .isInstanceOf(BusinessException.class);
 
+        // Assert
         verify(technologyRepository, never()).findAllById(any());
     }
 }
+

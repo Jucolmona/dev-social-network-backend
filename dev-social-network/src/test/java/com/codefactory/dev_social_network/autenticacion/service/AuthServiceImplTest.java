@@ -73,13 +73,16 @@ class AuthServiceImplTest {
     @Test
     @DisplayName("inicia sesion y devuelve el token cuando las credenciales son validas")
     void iniciaSesionExitosa() {
+        // Arrange
         usuarioExiste();
         when(credencialRepository.findByUsuarioId(usuarioId)).thenReturn(Optional.of(credencial("hash")));
         when(passwordEncoder.matches(PASSWORD, "hash")).thenReturn(true);
         when(jwtProvider.generarAccessToken(usuarioId)).thenReturn("jwt-firmado");
 
+        // Act
         LoginResponseDTO respuesta = service.iniciarSesion(new LoginRequestDTO(EMAIL, PASSWORD));
 
+        // Assert
         assertThat(respuesta.getEmail()).isEqualTo(EMAIL);
         assertThat(respuesta.getToken()).isEqualTo("jwt-firmado");
         assertThat(respuesta.getMensaje()).isNotBlank();
@@ -88,14 +91,17 @@ class AuthServiceImplTest {
     @Test
     @DisplayName("publica el evento de sesion iniciada y reinicia los intentos")
     void publicaEventoYReiniciaIntentos() {
+        // Arrange
         usuarioExiste();
         CredencialEntity cred = credencial("hash");
         when(credencialRepository.findByUsuarioId(usuarioId)).thenReturn(Optional.of(cred));
         when(passwordEncoder.matches(PASSWORD, "hash")).thenReturn(true);
         when(jwtProvider.generarAccessToken(usuarioId)).thenReturn("jwt-firmado");
 
+        // Act
         service.iniciarSesion(new LoginRequestDTO(EMAIL, PASSWORD));
 
+        // Assert
         verify(credencialBloqueoPolicy).reiniciarIntentosFallidos(cred);
         verify(credencialRepository).save(cred);
         verify(authEventPublisher).publicarSesionIniciada(eq(usuarioId), eq(EMAIL), any(), any());
@@ -104,20 +110,25 @@ class AuthServiceImplTest {
     @Test
     @DisplayName("falla si el usuario no existe")
     void fallaSiUsuarioNoExiste() {
+        // Arrange
         when(usuarioQueryService.buscarPorEmail(EMAIL)).thenReturn(Optional.empty());
 
+        // Act y Assert
         assertThatThrownBy(() -> service.iniciarSesion(new LoginRequestDTO(EMAIL, PASSWORD)))
                 .isInstanceOf(CredencialesInvalidasException.class);
 
+        // Assert
         verify(credencialRepository, never()).findByUsuarioId(any());
     }
 
     @Test
     @DisplayName("falla si el usuario existe pero no tiene credencial")
     void fallaSiNoTieneCredencial() {
+        // Arrange
         usuarioExiste();
         when(credencialRepository.findByUsuarioId(usuarioId)).thenReturn(Optional.empty());
 
+        // Act y Assert
         assertThatThrownBy(() -> service.iniciarSesion(new LoginRequestDTO(EMAIL, PASSWORD)))
                 .isInstanceOf(CredencialesInvalidasException.class);
     }
@@ -125,31 +136,41 @@ class AuthServiceImplTest {
     @Test
     @DisplayName("falla con cuenta bloqueada si la credencial sigue bloqueada")
     void fallaSiCuentaBloqueada() {
+        // Arrange
         usuarioExiste();
         CredencialEntity cred = credencial("hash");
+
+        // Act
         LocalDateTime hasta = LocalDateTime.now().plusMinutes(5);
         cred.setBloqueadoHasta(hasta);
+
+        // Assert
         when(credencialRepository.findByUsuarioId(usuarioId)).thenReturn(Optional.of(cred));
         when(credencialBloqueoPolicy.estaBloqueada(cred)).thenReturn(true);
 
+        // Act y Assert
         assertThatThrownBy(() -> service.iniciarSesion(new LoginRequestDTO(EMAIL, PASSWORD)))
                 .isInstanceOf(CuentaBloqueadaException.class);
 
+        // Assert
         verify(jwtProvider, never()).generarAccessToken(any());
     }
 
     @Test
     @DisplayName("una contrasena incorrecta cuenta un intento fallido y no devuelve token")
     void contrasenaIncorrectaCuentaIntento() {
+        // Arrange
         usuarioExiste();
         CredencialEntity cred = credencial("hash");
         when(credencialRepository.findByUsuarioId(usuarioId)).thenReturn(Optional.of(cred));
         when(passwordEncoder.matches(PASSWORD, "hash")).thenReturn(false);
         when(credencialBloqueoPolicy.estaBloqueada(cred)).thenReturn(false);
 
+        // Act y Assert
         assertThatThrownBy(() -> service.iniciarSesion(new LoginRequestDTO(EMAIL, PASSWORD)))
                 .isInstanceOf(CredencialesInvalidasException.class);
 
+        // Assert
         verify(credencialBloqueoPolicy).registrarIntentoFallido(cred);
         verify(credencialRepository).save(cred);
         verify(jwtProvider, never()).generarAccessToken(any());
@@ -158,21 +179,25 @@ class AuthServiceImplTest {
     @Test
     @DisplayName("un hash nulo se trata como contrasena incorrecta")
     void hashNuloEsCredencialInvalida() {
+        // Arrange
         usuarioExiste();
         CredencialEntity cred = credencial(null);
         when(credencialRepository.findByUsuarioId(usuarioId)).thenReturn(Optional.of(cred));
         when(credencialBloqueoPolicy.estaBloqueada(cred)).thenReturn(false);
 
+        // Act y Assert
         assertThatThrownBy(() -> service.iniciarSesion(new LoginRequestDTO(EMAIL, PASSWORD)))
                 .isInstanceOf(CredencialesInvalidasException.class);
-
         // No debe ni siquiera preguntar por el encoder: el hash es null.
+
+        // Assert
         verify(passwordEncoder, never()).matches(anyString(), any());
     }
 
     @Test
     @DisplayName("publica el evento de cuenta bloqueada cuando el intento fallido la bloquea")
     void publicaEventoCuentaBloqueada() {
+        // Arrange
         usuarioExiste();
         CredencialEntity cred = credencial("hash");
         when(credencialRepository.findByUsuarioId(usuarioId)).thenReturn(Optional.of(cred));
@@ -180,9 +205,12 @@ class AuthServiceImplTest {
         // Tras registrar el intento, la cuenta queda bloqueada.
         when(credencialBloqueoPolicy.estaBloqueada(cred)).thenReturn(false, true);
 
+        // Act y Assert
         assertThatThrownBy(() -> service.iniciarSesion(new LoginRequestDTO(EMAIL, PASSWORD)))
                 .isInstanceOf(CredencialesInvalidasException.class);
 
+        // Assert
         verify(authEventPublisher).publicarCuentaBloqueada(eq(usuarioId), eq(EMAIL), anyInt(), any());
     }
 }
+

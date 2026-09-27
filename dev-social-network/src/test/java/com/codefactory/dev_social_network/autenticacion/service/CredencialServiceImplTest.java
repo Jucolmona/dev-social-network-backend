@@ -30,13 +30,15 @@ class CredencialServiceImplTest {
     @Test
     @DisplayName("guarda la credencial con tipo LOCAL y el usuario recibido")
     void guardaCredencialLocal() {
+        // Arrange
         UUID usuarioId = UUID.randomUUID();
 
+        // Act
         service.crearCredencialLocal(usuarioId, "hash123");
 
+        // Assert
         ArgumentCaptor<CredencialEntity> captor = ArgumentCaptor.forClass(CredencialEntity.class);
         verify(credencialRepository, times(1)).save(captor.capture());
-
         CredencialEntity guardada = captor.getValue();
         assertThat(guardada.getUsuarioId()).isEqualTo(usuarioId);
         assertThat(guardada.getTipo()).isEqualTo("LOCAL");
@@ -47,11 +49,12 @@ class CredencialServiceImplTest {
     @Test
     @DisplayName("la credencial creada no tiene proveedor externo ni bloqueo")
     void credencialSinProveedorNiBloqueo() {
+        // Act
         service.crearCredencialLocal(UUID.randomUUID(), "hash123");
 
+        // Assert
         ArgumentCaptor<CredencialEntity> captor = ArgumentCaptor.forClass(CredencialEntity.class);
         verify(credencialRepository).save(captor.capture());
-
         assertThat(captor.getValue().getProveedorIdExterno()).isNull();
         assertThat(captor.getValue().getBloqueadoHasta()).isNull();
     }
@@ -59,8 +62,11 @@ class CredencialServiceImplTest {
     @Test
     @DisplayName("delega el guardado en el repositorio")
     void delegaElGuardado() {
+        // Act
         service.crearCredencialLocal(UUID.randomUUID(), "hash123");
 
+        // Assert
         verify(credencialRepository).save(any(CredencialEntity.class));
     }
 }
+

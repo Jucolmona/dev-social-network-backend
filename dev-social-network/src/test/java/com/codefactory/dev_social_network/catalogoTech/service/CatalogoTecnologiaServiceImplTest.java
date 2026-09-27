@@ -39,50 +39,76 @@ class CatalogoTecnologiaServiceImplTest {
     @Test
     @DisplayName("una lista de tecnologias nula se considera disponible")
     void listaNulaEsDisponible() {
-        assertThat(service.isTecnologyAvailable(null)).isTrue();
+        // Act
+        var resultado = service.isTecnologyAvailable(null);
 
+        // Assert
+        assertThat(resultado).isTrue();
         verify(tecnologiasRepository, never()).existsByNameTecnologyIgnoreCase(anyString());
     }
 
     @Test
     @DisplayName("una lista vacia se considera disponible")
     void listaVaciaEsDisponible() {
-        assertThat(service.isTecnologyAvailable(List.of())).isTrue();
+        // Act
+        var resultado = service.isTecnologyAvailable(List.of());
+
+        // Assert
+        assertThat(resultado).isTrue();
     }
 
     @Test
     @DisplayName("todas las tecnologias presentes la marcan como disponible")
     void todasLasTecnologiasExisten() {
+        // Arrange
         when(tecnologiasRepository.existsByNameTecnologyIgnoreCase("Java")).thenReturn(true);
         when(tecnologiasRepository.existsByNameTecnologyIgnoreCase("Spring")).thenReturn(true);
 
-        assertThat(service.isTecnologyAvailable(List.of("Java", "Spring"))).isTrue();
+        // Act
+        var resultado = service.isTecnologyAvailable(List.of("Java", "Spring"));
+
+        // Assert
+        assertThat(resultado).isTrue();
     }
 
     @Test
     @DisplayName("una sola tecnologia ausente hace que la lista no sea valida")
     void unaTecnologiaAusenteInvalida() {
+        // Arrange
         when(tecnologiasRepository.existsByNameTecnologyIgnoreCase("Java")).thenReturn(true);
         when(tecnologiasRepository.existsByNameTecnologyIgnoreCase("Klingon")).thenReturn(false);
 
-        assertThat(service.isTecnologyAvailable(List.of("Java", "Klingon"))).isFalse();
+        // Act
+        var resultado = service.isTecnologyAvailable(List.of("Java", "Klingon"));
+
+        // Assert
+        assertThat(resultado).isFalse();
     }
 
     @Test
     @DisplayName("recorta el nombre antes de buscar, ignorando espacios sobrantes")
     void normalizaNombreTecnologia() {
-        // trim() no cambia las mayusculas: por eso se busca "jAvA".
+        // Arrange
         when(tecnologiasRepository.existsByNameTecnologyIgnoreCase("jAvA")).thenReturn(true);
 
-        assertThat(service.isTecnologyAvailable(List.of("  jAvA  "))).isTrue();
+        // Act
+        var resultado = service.isTecnologyAvailable(List.of("  jAvA  "));
+
+        // Assert
+        assertThat(resultado).isTrue();
     }
 
     @Test
     @DisplayName("un nombre de tecnologia nulo consulta el repositorio con cadena vacia")
     void nombreNuloSeBuscaComoVacio() {
+        // Arrange
         when(tecnologiasRepository.existsByNameTecnologyIgnoreCase("")).thenReturn(false);
 
-        assertThat(service.isTecnologyAvailable(java.util.Arrays.asList((String) null))).isFalse();
+        // Act
+        var resultado = service.isTecnologyAvailable(java.util.Arrays.asList((String) null));
+
+        // Assert
+        assertThat(resultado).isFalse();
     }
 
     // ---------------------------------------------- obtenerNombresDisponibles
@@ -90,9 +116,14 @@ class CatalogoTecnologiaServiceImplTest {
     @Test
     @DisplayName("devuelve los nombres de las tecnologias del catalogo")
     void devuelveNombresDisponibles() {
+        // Arrange
         when(tecnologiasRepository.findAll()).thenReturn(List.of(tecnologia("Java"), tecnologia("Spring")));
 
-        assertThat(service.obtenerNombresDisponibles()).containsExactly("Java", "Spring");
+        // Act
+        var resultado = service.obtenerNombresDisponibles();
+
+        // Assert
+        assertThat(resultado).containsExactly("Java", "Spring");
     }
 
     // ------------------------------------------------------- existe
@@ -100,33 +131,57 @@ class CatalogoTecnologiaServiceImplTest {
     @Test
     @DisplayName("existe devuelve true cuando la tecnologia esta en el catalogo")
     void existeEnCatalogo() {
+        // Arrange
         when(tecnologiasRepository.existsByNameTecnologyIgnoreCase("Java")).thenReturn(true);
 
-        assertThat(service.existe("Java")).isTrue();
+        // Act
+        var resultado = service.existe("Java");
+
+        // Assert
+        assertThat(resultado).isTrue();
     }
 
     @Test
     @DisplayName("existe devuelve false cuando la tecnologia no esta en el catalogo")
     void noExisteEnCatalogo() {
+        // Arrange
         when(tecnologiasRepository.existsByNameTecnologyIgnoreCase("Klingon")).thenReturn(false);
 
-        assertThat(service.existe("Klingon")).isFalse();
+        // Act
+        var resultado = service.existe("Klingon");
+
+        // Assert
+        assertThat(resultado).isFalse();
     }
 
     @Test
     @DisplayName("existe devuelve false para un nombre nulo o vacio sin consultar el repositorio")
     void existeConNombreVacio() {
-        assertThat(service.existe(null)).isFalse();
-        assertThat(service.existe("   ")).isFalse();
+        // Act
+        var resultado = service.existe(null);
 
+        // Assert
+        assertThat(resultado).isFalse();
+
+        // Act
+        var resultado2 = service.existe("   ");
+
+        // Assert
+        assertThat(resultado2).isFalse();
         verify(tecnologiasRepository, never()).existsByNameTecnologyIgnoreCase(anyString());
     }
 
     @Test
     @DisplayName("existe recorta el nombre antes de consultar")
     void existeRecortaElNombre() {
+        // Arrange
         when(tecnologiasRepository.existsByNameTecnologyIgnoreCase("Java")).thenReturn(true);
 
-        assertThat(service.existe("  Java  ")).isTrue();
+        // Act
+        var resultado = service.existe("  Java  ");
+
+        // Assert
+        assertThat(resultado).isTrue();
     }
 }
+

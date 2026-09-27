@@ -24,32 +24,45 @@ class CredencialBloqueoPolicyImplTest {
     @Test
     @DisplayName("una credencial sin bloqueo no esta bloqueada")
     void sinBloqueoNoEstaBloqueada() {
-        assertThat(policy.estaBloqueada(credencial(0, null))).isFalse();
+        // Act
+        var resultado = policy.estaBloqueada(credencial(0, null));
+
+        // Assert
+        assertThat(resultado).isFalse();
     }
 
     @Test
     @DisplayName("una credencial con bloqueo en el futuro esta bloqueada")
     void bloqueoEnFuturoEstaBloqueada() {
+        // Act
         CredencialEntity c = credencial(3, LocalDateTime.now().plusMinutes(5));
+        var resultado = policy.estaBloqueada(c);
 
-        assertThat(policy.estaBloqueada(c)).isTrue();
+        // Assert
+        assertThat(resultado).isTrue();
     }
 
     @Test
     @DisplayName("una credencial con bloqueo en el pasado ya no esta bloqueada")
     void bloqueoEnPasadoNoEstaBloqueada() {
+        // Act
         CredencialEntity c = credencial(3, LocalDateTime.now().minusMinutes(1));
+        var resultado = policy.estaBloqueada(c);
 
-        assertThat(policy.estaBloqueada(c)).isFalse();
+        // Assert
+        assertThat(resultado).isFalse();
     }
 
     @Test
     @DisplayName("un intento fallido incrementa el contador sin bloquear")
     void intentoFallidoIncrementaContador() {
+        // Arrange
         CredencialEntity c = credencial(0, null);
 
+        // Act
         policy.registrarIntentoFallido(c);
 
+        // Assert
         assertThat(c.getIntentosFallidos()).isEqualTo(1);
         assertThat(c.getBloqueadoHasta()).isNull();
     }
@@ -57,10 +70,13 @@ class CredencialBloqueoPolicyImplTest {
     @Test
     @DisplayName("al tercer intento fallido la cuenta queda bloqueada 5 minutos")
     void tercerIntentoBloquea() {
+        // Arrange
         CredencialEntity c = credencial(2, null);
 
+        // Act
         policy.registrarIntentoFallido(c);
 
+        // Assert
         assertThat(c.getIntentosFallidos()).isEqualTo(3);
         assertThat(c.getBloqueadoHasta()).isNotNull();
         assertThat(c.getBloqueadoHasta()).isAfter(LocalDateTime.now());
@@ -69,10 +85,11 @@ class CredencialBloqueoPolicyImplTest {
     @Test
     @DisplayName("reiniciar deja el contador en cero y quita el bloqueo")
     void reiniciarLimpiaElContador() {
+        // Act
         CredencialEntity c = credencial(3, LocalDateTime.now().plusMinutes(5));
-
         policy.reiniciarIntentosFallidos(c);
 
+        // Assert
         assertThat(c.getIntentosFallidos()).isZero();
         assertThat(c.getBloqueadoHasta()).isNull();
     }
@@ -80,10 +97,11 @@ class CredencialBloqueoPolicyImplTest {
     @Test
     @DisplayName("un bloqueo vencido se libera automaticamente")
     void bloqueoVencidoSeLibera() {
+        // Act
         CredencialEntity c = credencial(3, LocalDateTime.now().minusMinutes(1));
-
         policy.desbloquearSiVencio(c);
 
+        // Assert
         assertThat(c.getIntentosFallidos()).isZero();
         assertThat(c.getBloqueadoHasta()).isNull();
     }
@@ -91,10 +109,11 @@ class CredencialBloqueoPolicyImplTest {
     @Test
     @DisplayName("un bloqueo vigente no se toca al verificar el vencimiento")
     void bloqueoVigenteNoSeToca() {
+        // Act
         CredencialEntity c = credencial(3, LocalDateTime.now().plusMinutes(5));
-
         policy.desbloquearSiVencio(c);
 
+        // Assert
         assertThat(c.getIntentosFallidos()).isEqualTo(3);
         assertThat(c.getBloqueadoHasta()).isNotNull();
     }
@@ -102,11 +121,15 @@ class CredencialBloqueoPolicyImplTest {
     @Test
     @DisplayName("una credencial nunca bloqueada no cambia al verificar el vencimiento")
     void credencialNoBloqueadaNoCambia() {
+        // Arrange
         CredencialEntity c = credencial(1, null);
 
+        // Act
         policy.desbloquearSiVencio(c);
 
+        // Assert
         assertThat(c.getIntentosFallidos()).isEqualTo(1);
         assertThat(c.getBloqueadoHasta()).isNull();
     }
 }
+
