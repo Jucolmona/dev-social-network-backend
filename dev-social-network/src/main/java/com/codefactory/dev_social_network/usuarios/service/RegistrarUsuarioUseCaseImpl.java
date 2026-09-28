@@ -21,16 +21,16 @@ public class RegistrarUsuarioUseCaseImpl implements RegistrarUsuarioUseCase {
     private final CredencialService credencialService;
     private final UserProfileRepositoryPort userProfileRepositoryPort;
     private final PasswordHasher passwordHasher;
-    
     private final EmailValidator emailValidator;
     private final PasswordValidator passwordValidator;
 
-    public RegistrarUsuarioUseCaseImpl(UsuarioRepositoryPort usuarioRepositoryPort,
-                                       CredencialService credencialService,
-                                       UserProfileRepositoryPort userProfileRepositoryPort,
-                                       PasswordHasher passwordHasher,
-                                       EmailValidator emailValidator,
-                                       PasswordValidator passwordValidator) {
+    public RegistrarUsuarioUseCaseImpl(
+            UsuarioRepositoryPort usuarioRepositoryPort,
+            CredencialService credencialService,
+            UserProfileRepositoryPort userProfileRepositoryPort,
+            PasswordHasher passwordHasher,
+            EmailValidator emailValidator,
+            PasswordValidator passwordValidator) {
         this.usuarioRepositoryPort = usuarioRepositoryPort;
         this.credencialService = credencialService;
         this.userProfileRepositoryPort = userProfileRepositoryPort;
@@ -51,11 +51,10 @@ public class RegistrarUsuarioUseCaseImpl implements RegistrarUsuarioUseCase {
         }
 
         Usuario usuarioGuardado = usuarioRepositoryPort.guardar(new Usuario(nombre, apellido, email));
-        
+
         credencialService.crearCredencialLocal(
                 usuarioGuardado.getId(), passwordHasher.hashear(contrasena));
 
-        
         userProfileRepositoryPort.guardar(new UserProfileEntity(usuarioGuardado));
 
         return usuarioGuardado.getId();

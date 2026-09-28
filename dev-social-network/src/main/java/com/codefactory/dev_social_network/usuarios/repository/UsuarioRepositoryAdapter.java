@@ -1,6 +1,7 @@
 package com.codefactory.dev_social_network.usuarios.repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
@@ -29,5 +30,10 @@ public class UsuarioRepositoryAdapter implements UsuarioRepositoryPort {
     @Override
     public Optional<Usuario> buscarPorEmail(String email) {
         return jpaRepository.findByEmail(email);
+    }
+
+    @Override
+    public Optional<Usuario> buscarPorId(UUID id) {
+        return jpaRepository.findById(id);
     }
 }
