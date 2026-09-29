@@ -14,7 +14,7 @@ import com.codefactory.dev_social_network.usuarios.dto.RegistroUsuarioResponse;
 import com.codefactory.dev_social_network.usuarios.interfaces.RegistrarUsuarioUseCase;
 
 @RestController
-@RequestMapping("/api/usuarios")
+@RequestMapping("/api/v1/usuarios")
 public class UsuarioController {
 
     private final RegistrarUsuarioUseCase registrarUsuarioUseCase;
